@@ -154,57 +154,125 @@ async function handleCallNext() {
 }
 
 async function handleStartConsultation() {
-    const resp = await HospitalAJAX.getDoctorQueue();
-    if (!resp || !resp.data || !resp.data.currentServing) return;
-    const queueId = resp.data.currentServing.queueId;
+    const btn = document.getElementById("btnStartConsultation");
+    let queueId = btn ? btn.dataset.queueId : null;
+
+    if (!queueId) {
+        try {
+            const resp = await HospitalAJAX.getDoctorQueue();
+            if (resp && resp.data && resp.data.currentServing) {
+                queueId = resp.data.currentServing.queueId;
+            }
+        } catch (ignored) {}
+    }
+
+    if (!queueId) {
+        alert("No active patient is currently called to start consultation.");
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "Starting...";
 
     try {
         const r = await HospitalAJAX.doctorStartConsultation(queueId);
         if (r && r.success) {
-            QueueManager.updateDoctorDashboard();
+            alert(r.message || "Consultation started!");
+            await QueueManager.updateDoctorDashboard();
         } else {
             alert(r ? r.message : "Could not start consultation.");
         }
     } catch (e) {
-        alert("Error: " + e.message);
+        alert("Error starting consultation: " + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = "&#9654; Start Consultation";
     }
 }
 
 async function handleCompleteConsultation() {
-    const resp = await HospitalAJAX.getDoctorQueue();
-    if (!resp || !resp.data || !resp.data.currentServing) return;
-    const queueId = resp.data.currentServing.queueId;
+    const btn = document.getElementById("btnCompleteConsultation");
+    let queueId = btn ? btn.dataset.queueId : null;
+    let token = btn ? btn.dataset.token : "";
 
-    if (!confirm("Are you sure you want to complete consultation for Token " + resp.data.currentServing.tokenNumber + "?")) return;
+    if (!queueId) {
+        try {
+            const resp = await HospitalAJAX.getDoctorQueue();
+            if (resp && resp.data && resp.data.currentServing) {
+                queueId = resp.data.currentServing.queueId;
+                token = resp.data.currentServing.tokenNumber;
+            }
+        } catch (ignored) {}
+    }
+
+    if (!queueId) {
+        alert("No active patient is currently in consultation.");
+        return;
+    }
+
+    if (!confirm("Are you sure you want to complete consultation for Token " + (token || queueId) + "?")) {
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "Completing...";
 
     try {
         const r = await HospitalAJAX.doctorCompleteConsultation(queueId);
         if (r && r.success) {
-            QueueManager.updateDoctorDashboard();
+            alert(r.message || "Consultation completed successfully!");
+            await QueueManager.updateDoctorDashboard();
         } else {
             alert(r ? r.message : "Could not complete consultation.");
         }
     } catch (e) {
-        alert("Error: " + e.message);
+        alert("Error completing consultation: " + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = "&#10003; Complete Consultation";
     }
 }
 
 async function handleMarkAbsent() {
-    const resp = await HospitalAJAX.getDoctorQueue();
-    if (!resp || !resp.data || !resp.data.currentServing) return;
-    const queueId = resp.data.currentServing.queueId;
+    const btn = document.getElementById("btnMarkAbsent");
+    let queueId = btn ? btn.dataset.queueId : null;
+    let token = btn ? btn.dataset.token : "";
 
-    if (!confirm("Mark patient for Token " + resp.data.currentServing.tokenNumber + " as ABSENT?")) return;
+    if (!queueId) {
+        try {
+            const resp = await HospitalAJAX.getDoctorQueue();
+            if (resp && resp.data && resp.data.currentServing) {
+                queueId = resp.data.currentServing.queueId;
+                token = resp.data.currentServing.tokenNumber;
+            }
+        } catch (ignored) {}
+    }
+
+    if (!queueId) {
+        alert("No active patient is currently called to mark absent.");
+        return;
+    }
+
+    if (!confirm("Mark patient for Token " + (token || queueId) + " as ABSENT?")) {
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "Marking Absent...";
 
     try {
         const r = await HospitalAJAX.doctorMarkAbsent(queueId);
         if (r && r.success) {
-            QueueManager.updateDoctorDashboard();
+            alert(r.message || "Patient marked as absent.");
+            await QueueManager.updateDoctorDashboard();
         } else {
             alert(r ? r.message : "Could not mark absent.");
         }
     } catch (e) {
-        alert("Error: " + e.message);
+        alert("Error marking absent: " + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = "&#10006; Mark Absent";
     }
 }
 </script>

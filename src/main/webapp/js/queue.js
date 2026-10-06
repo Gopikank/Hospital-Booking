@@ -158,9 +158,21 @@ const QueueManager = {
                         <div class="card-subtext">Source: <span class="badge badge-${cs.bookingSource.toLowerCase()}">${cs.bookingSource}</span> | Status: <span class="badge badge-${cs.status.toLowerCase()}">${cs.status}</span></div>
                     `;
                 }
-                if (btnStart) btnStart.style.display = (cs.status === 'CALLED') ? 'inline-flex' : 'none';
-                if (btnComplete) btnComplete.style.display = (cs.status === 'IN_CONSULTATION' || cs.status === 'CALLED') ? 'inline-flex' : 'none';
-                if (btnAbsent) btnAbsent.style.display = (cs.status === 'CALLED') ? 'inline-flex' : 'none';
+                if (btnStart) {
+                    btnStart.dataset.queueId = cs.queueId;
+                    btnStart.dataset.token = cs.tokenNumber;
+                    btnStart.style.display = (cs.status === 'CALLED') ? 'inline-flex' : 'none';
+                }
+                if (btnComplete) {
+                    btnComplete.dataset.queueId = cs.queueId;
+                    btnComplete.dataset.token = cs.tokenNumber;
+                    btnComplete.style.display = (cs.status === 'IN_CONSULTATION' || cs.status === 'CALLED') ? 'inline-flex' : 'none';
+                }
+                if (btnAbsent) {
+                    btnAbsent.dataset.queueId = cs.queueId;
+                    btnAbsent.dataset.token = cs.tokenNumber;
+                    btnAbsent.style.display = (cs.status === 'CALLED') ? 'inline-flex' : 'none';
+                }
                 if (btnCallNext) btnCallNext.disabled = (cs.status === 'IN_CONSULTATION');
             } else {
                 if (servingCard) {
