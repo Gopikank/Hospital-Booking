@@ -36,10 +36,21 @@ public class DBConnection {
             String envPassword = System.getenv("DB_PASSWORD");
 
             if (envUrl != null && !envUrl.trim().isEmpty()) {
+                envUrl = envUrl.trim();
+                if (envUrl.startsWith("mysql://")) {
+                    envUrl = "jdbc:" + envUrl;
+                } else if (!envUrl.startsWith("jdbc:mysql://") && envUrl.contains("aivencloud.com")) {
+                    envUrl = "jdbc:mysql://" + envUrl;
+                }
+
+                // If connecting to cloud/Aiven, ensure SSL does not reject custom Aiven CA certs
+                if (envUrl.contains("aivencloud.com") && !envUrl.contains("verifyServerCertificate")) {
+                    envUrl += (envUrl.contains("?") ? "&" : "?") + "verifyServerCertificate=false&useSSL=true&allowPublicKeyRetrieval=true";
+                }
                 url = envUrl;
             }
             if (envUser != null && !envUser.trim().isEmpty()) {
-                username = envUser;
+                username = envUser.trim();
             }
             if (envPassword != null) {
                 password = envPassword;
@@ -51,7 +62,12 @@ public class DBConnection {
     }
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(url, username, password);
+        try {
+            return DriverManager.getConnection(url, username, password);
+        } catch (SQLException e) {
+            System.err.println("[DBConnection Error] Failed to connect to URL: " + url + " with user: " + username + " - " + e.getMessage());
+            throw e;
+        }
     }
 
     public static void close(AutoCloseable... closeables) {

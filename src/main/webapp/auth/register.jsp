@@ -24,8 +24,15 @@
             <div class="alert alert-warning">Password must be at least 6 characters long.</div>
         <% } else if ("email_exists".equals(error)) { %>
             <div class="alert alert-danger">An account with this email address already exists.</div>
-        <% } else if ("failed".equals(error) || "server_error".equals(error)) { %>
-            <div class="alert alert-danger">Registration could not be completed. Please try again.</div>
+        <% } else if ("failed".equals(error) || "server_error".equals(error)) { 
+            String detailMsg = request.getParameter("msg");
+        %>
+            <div class="alert alert-danger">
+                Registration could not be completed. Please try again.
+                <% if (detailMsg != null && !detailMsg.trim().isEmpty()) { %>
+                    <br><small style="font-size: 0.8rem; opacity: 0.9;"><strong>Reason:</strong> <%= detailMsg %></small>
+                <% } %>
+            </div>
         <% } %>
 
         <form action="${pageContext.request.contextPath}/auth/register" method="POST" onsubmit="return validateForm()">

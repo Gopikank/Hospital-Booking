@@ -76,7 +76,9 @@ public class RegisterServlet extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            handleError(resp, isAjax, req.getContextPath() + "/auth/register.jsp?error=server_error", "An error occurred during registration.");
+            String msg = (e.getMessage() != null) ? e.getMessage() : e.getClass().getSimpleName();
+            String encodedMsg = java.net.URLEncoder.encode(msg, java.nio.charset.StandardCharsets.UTF_8);
+            handleError(resp, isAjax, req.getContextPath() + "/auth/register.jsp?error=server_error&msg=" + encodedMsg, "An error occurred during registration: " + msg);
         }
     }
 
