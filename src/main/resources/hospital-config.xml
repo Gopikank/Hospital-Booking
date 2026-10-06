@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hospital SYSTEM "hospital-config.dtd">
+<hospital xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="hospital-config.xsd">
+    <name>City Care Hospital</name>
+
+    <queueSettings>
+        <defaultAverageConsultationTime>5</defaultAverageConsultationTime>
+        <maximumOnlineBookings>30</maximumOnlineBookings>
+        <checkInRequired>true</checkInRequired>
+    </queueSettings>
+
+    <departments>
+        <department id="D01">
+            <name>General Medicine</name>
+            <room>101</room>
+            <averageTime>5</averageTime>
+        </department>
+
+        <department id="D02">
+            <name>Cardiology</name>
+            <room>202</room>
+            <averageTime>10</averageTime>
+        </department>
+
+        <department id="D03">
+            <name>Orthopedics</name>
+            <room>305</room>
+            <averageTime>8</averageTime>
+        </department>
+
+        <department id="D04">
+            <name>Pediatrics</name>
+            <room>401</room>
+            <averageTime>6</averageTime>
+        </department>
+    </departments>
+</hospital>

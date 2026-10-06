@@ -1,0 +1,8 @@
+target/
+*.class
+.settings/
+.metadata/
+*.log
+.system_generated/
+scratch/
+test.pdf

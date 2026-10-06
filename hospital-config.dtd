@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DTD for Hospital Configuration -->
+<!ELEMENT hospital (name, queueSettings, departments)>
+<!ATTLIST hospital
+    xmlns:xsi CDATA #IMPLIED
+    xsi:noNamespaceSchemaLocation CDATA #IMPLIED>
+<!ELEMENT name (#PCDATA)>
+
+<!ELEMENT queueSettings (defaultAverageConsultationTime, maximumOnlineBookings, checkInRequired)>
+<!ELEMENT defaultAverageConsultationTime (#PCDATA)>
+<!ELEMENT maximumOnlineBookings (#PCDATA)>
+<!ELEMENT checkInRequired (#PCDATA)>
+
+<!ELEMENT departments (department+)>
+<!ELEMENT department (name, room, averageTime)>
+<!ATTLIST department id ID #REQUIRED>
+
+<!ELEMENT room (#PCDATA)>
+<!ELEMENT averageTime (#PCDATA)>
