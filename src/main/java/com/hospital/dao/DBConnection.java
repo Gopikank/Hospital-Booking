@@ -29,6 +29,21 @@ public class DBConnection {
                 username = "root";
                 password = "Gopika@2006";
             }
+
+            // Cloud deployment override via Environment Variables (e.g. Render / Railway / Docker)
+            String envUrl = System.getenv("DB_URL");
+            String envUser = System.getenv("DB_USER");
+            String envPassword = System.getenv("DB_PASSWORD");
+
+            if (envUrl != null && !envUrl.trim().isEmpty()) {
+                url = envUrl;
+            }
+            if (envUser != null && !envUser.trim().isEmpty()) {
+                username = envUser;
+            }
+            if (envPassword != null) {
+                password = envPassword;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to initialize database connection configuration", e);
