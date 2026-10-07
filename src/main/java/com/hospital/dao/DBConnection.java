@@ -43,9 +43,9 @@ public class DBConnection {
                     envUrl = "jdbc:mysql://" + envUrl;
                 }
 
-                // If connecting to cloud/Aiven, ensure SSL does not reject custom Aiven CA certs
+                // If connecting to cloud/Aiven, ensure SSL does not reject custom Aiven CA certs and add connection timeout
                 if (envUrl.contains("aivencloud.com") && !envUrl.contains("verifyServerCertificate")) {
-                    envUrl += (envUrl.contains("?") ? "&" : "?") + "verifyServerCertificate=false&useSSL=true&allowPublicKeyRetrieval=true";
+                    envUrl += (envUrl.contains("?") ? "&" : "?") + "verifyServerCertificate=false&useSSL=true&allowPublicKeyRetrieval=true&connectTimeout=5000&socketTimeout=15000";
                 }
                 url = envUrl;
             }

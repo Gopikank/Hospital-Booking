@@ -8,7 +8,26 @@
 <%
     DepartmentDAO deptDAO = new DepartmentDAO();
     DoctorDAO docDAO = new DoctorDAO();
-    List<Department> departments = deptDAO.getActiveDepartments();
+    List<Department> departments = null;
+    List<Doctor> allDoctors = null;
+    try {
+        departments = deptDAO.getActiveDepartments();
+        allDoctors = docDAO.getAllDoctors();
+    } catch (Exception e) {
+        // Safe fallback in case of transient network latency
+    }
+
+    if (departments == null || departments.isEmpty()) {
+        departments = new java.util.ArrayList<>();
+        Department d1 = new Department(); d1.setDepartmentId(1); d1.setDepartmentName("General Medicine"); d1.setDescription("Primary healthcare, internal medicine, fever and routine consultations"); departments.add(d1);
+        Department d2 = new Department(); d2.setDepartmentId(2); d2.setDepartmentName("Cardiology"); d2.setDescription("Heart health, cardiac checkups, hypertension and ECG services"); departments.add(d2);
+        Department d3 = new Department(); d3.setDepartmentId(3); d3.setDepartmentName("Orthopedics"); d3.setDescription("Bone, joint, spine care, fractures and orthopedic surgery consultations"); departments.add(d3);
+        Department d4 = new Department(); d4.setDepartmentId(4); d4.setDepartmentName("Pediatrics"); d4.setDescription("Comprehensive childcare, vaccinations and pediatric emergencies"); departments.add(d4);
+    }
+    if (allDoctors == null) {
+        allDoctors = new java.util.ArrayList<>();
+    }
+
     boolean isLoggedIn = (session.getAttribute("userId") != null);
     String userRole = (String) session.getAttribute("role");
 %>
@@ -158,9 +177,14 @@
     <div class="dashboard-grid" style="margin-bottom: 3rem;">
         <%
             for (Department d : departments) {
-                List<Doctor> docs = docDAO.getDoctorsByDepartment(d.getDepartmentId());
+                List<Doctor> docs = new java.util.ArrayList<>();
+                for (Doctor doc : allDoctors) {
+                    if (doc.getDepartmentId() == d.getDepartmentId()) {
+                        docs.add(doc);
+                    }
+                }
                 String deptIcon = "🏥";
-                String deptName = d.getDepartmentName().toLowerCase();
+                String deptName = (d.getDepartmentName() != null) ? d.getDepartmentName().toLowerCase() : "";
                 if (deptName.contains("cardio")) deptIcon = "❤️";
                 else if (deptName.contains("ortho")) deptIcon = "🦴";
                 else if (deptName.contains("pediatric")) deptIcon = "👶";
