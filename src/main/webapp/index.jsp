@@ -1,33 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="com.hospital.dao.DepartmentDAO, com.hospital.dao.DoctorDAO, com.hospital.model.Department, com.hospital.model.Doctor, java.util.List" %>
 <jsp:include page="/WEB-INF/includes/header.jsp">
     <jsp:param name="title" value="City Care Hospital - Modern Healthcare & Smart Queue System" />
 </jsp:include>
 <jsp:include page="/WEB-INF/includes/navbar.jsp" />
 
 <%
-    DepartmentDAO deptDAO = new DepartmentDAO();
-    DoctorDAO docDAO = new DoctorDAO();
-    List<Department> departments = null;
-    List<Doctor> allDoctors = null;
-    try {
-        departments = deptDAO.getActiveDepartments();
-        allDoctors = docDAO.getAllDoctors();
-    } catch (Exception e) {
-        // Safe fallback in case of transient network latency
-    }
-
-    if (departments == null || departments.isEmpty()) {
-        departments = new java.util.ArrayList<>();
-        Department d1 = new Department(); d1.setDepartmentId(1); d1.setDepartmentName("General Medicine"); d1.setDescription("Primary healthcare, internal medicine, fever and routine consultations"); departments.add(d1);
-        Department d2 = new Department(); d2.setDepartmentId(2); d2.setDepartmentName("Cardiology"); d2.setDescription("Heart health, cardiac checkups, hypertension and ECG services"); departments.add(d2);
-        Department d3 = new Department(); d3.setDepartmentId(3); d3.setDepartmentName("Orthopedics"); d3.setDescription("Bone, joint, spine care, fractures and orthopedic surgery consultations"); departments.add(d3);
-        Department d4 = new Department(); d4.setDepartmentId(4); d4.setDepartmentName("Pediatrics"); d4.setDescription("Comprehensive childcare, vaccinations and pediatric emergencies"); departments.add(d4);
-    }
-    if (allDoctors == null) {
-        allDoctors = new java.util.ArrayList<>();
-    }
-
     boolean isLoggedIn = (session.getAttribute("userId") != null);
     String userRole = (String) session.getAttribute("role");
 %>
@@ -175,58 +152,133 @@
     </div>
 
     <div class="dashboard-grid" style="margin-bottom: 3rem;">
-        <%
-            for (Department d : departments) {
-                List<Doctor> docs = new java.util.ArrayList<>();
-                for (Doctor doc : allDoctors) {
-                    if (doc.getDepartmentId() == d.getDepartmentId()) {
-                        docs.add(doc);
-                    }
-                }
-                String deptIcon = "🏥";
-                String deptName = (d.getDepartmentName() != null) ? d.getDepartmentName().toLowerCase() : "";
-                if (deptName.contains("cardio")) deptIcon = "❤️";
-                else if (deptName.contains("ortho")) deptIcon = "🦴";
-                else if (deptName.contains("pediatric")) deptIcon = "👶";
-                else if (deptName.contains("general") || deptName.contains("medicine")) deptIcon = "🩺";
-        %>
-            <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
-                <div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                        <span style="font-size: 1.75rem;"><%= deptIcon %></span>
-                        <span class="badge badge-completed"><%= docs.size() %> Doctor<%= docs.size() == 1 ? "" : "s" %></span>
+        <!-- General Medicine -->
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                    <span style="font-size: 1.75rem;">🩺</span>
+                    <span class="badge badge-completed">1 Specialist</span>
+                </div>
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 0.5rem;">
+                    General Medicine
+                </h3>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.25rem; line-height: 1.5;">
+                    Primary healthcare, internal medicine, fever and routine consultations.
+                </p>
+                
+                <div style="border-top: 1px solid var(--border-color); padding-top: 0.85rem; margin-bottom: 1rem;">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
+                        Consulting Doctors:
                     </div>
-                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 0.5rem;">
-                        <%= d.getDepartmentName() %>
-                    </h3>
-                    <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.25rem; line-height: 1.5;">
-                        <%= d.getDescription() %>
-                    </p>
-                    
-                    <div style="border-top: 1px solid var(--border-color); padding-top: 0.85rem; margin-bottom: 1rem;">
-                        <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
-                            Consulting Doctors:
-                        </div>
-                        <% if (docs.isEmpty()) { %>
-                            <div style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">Specialist consultations on appointment</div>
-                        <% } else {
-                            for (Doctor doc : docs) { %>
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; font-size: 0.9rem;">
-                                    <strong style="color: var(--text-main);"><%= doc.getDoctorName() %></strong>
-                                    <span style="font-size: 0.8rem; color: var(--text-muted); background: var(--bg-main); padding: 0.15rem 0.5rem; border-radius: var(--radius-sm);">
-                                        Room <%= doc.getRoomNumber() != null ? doc.getRoomNumber() : "101" %>
-                                    </span>
-                                </div>
-                            <% }
-                        } %>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; font-size: 0.9rem;">
+                        <strong style="color: var(--text-main);">Dr. Rajesh Kumar</strong>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); background: var(--bg-main); padding: 0.15rem 0.5rem; border-radius: var(--radius-sm);">
+                            Room 101
+                        </span>
                     </div>
                 </div>
-
-                <a href="${pageContext.request.contextPath}/patient/book-token.jsp" class="btn btn-outline" style="width: 100%; text-align: center; margin-top: 0.5rem;">
-                    Book Token Online
-                </a>
             </div>
-        <% } %>
+
+            <a href="${pageContext.request.contextPath}/patient/book-token.jsp" class="btn btn-outline" style="width: 100%; text-align: center; margin-top: 0.5rem;">
+                Book Token Online
+            </a>
+        </div>
+
+        <!-- Cardiology -->
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                    <span style="font-size: 1.75rem;">❤️</span>
+                    <span class="badge badge-completed">1 Specialist</span>
+                </div>
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 0.5rem;">
+                    Cardiology
+                </h3>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.25rem; line-height: 1.5;">
+                    Heart health, cardiac checkups, hypertension and ECG services.
+                </p>
+                
+                <div style="border-top: 1px solid var(--border-color); padding-top: 0.85rem; margin-bottom: 1rem;">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
+                        Consulting Doctors:
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; font-size: 0.9rem;">
+                        <strong style="color: var(--text-main);">Dr. Priya Sharma</strong>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); background: var(--bg-main); padding: 0.15rem 0.5rem; border-radius: var(--radius-sm);">
+                            Room 102
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <a href="${pageContext.request.contextPath}/patient/book-token.jsp" class="btn btn-outline" style="width: 100%; text-align: center; margin-top: 0.5rem;">
+                Book Token Online
+            </a>
+        </div>
+
+        <!-- Orthopedics -->
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                    <span style="font-size: 1.75rem;">🦴</span>
+                    <span class="badge badge-completed">1 Specialist</span>
+                </div>
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 0.5rem;">
+                    Orthopedics
+                </h3>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.25rem; line-height: 1.5;">
+                    Bone, joint, spine care, fractures and orthopedic surgery consultations.
+                </p>
+                
+                <div style="border-top: 1px solid var(--border-color); padding-top: 0.85rem; margin-bottom: 1rem;">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
+                        Consulting Doctors:
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; font-size: 0.9rem;">
+                        <strong style="color: var(--text-main);">Dr. Arun Patel</strong>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); background: var(--bg-main); padding: 0.15rem 0.5rem; border-radius: var(--radius-sm);">
+                            Room 103
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <a href="${pageContext.request.contextPath}/patient/book-token.jsp" class="btn btn-outline" style="width: 100%; text-align: center; margin-top: 0.5rem;">
+                Book Token Online
+            </a>
+        </div>
+
+        <!-- Pediatrics -->
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                    <span style="font-size: 1.75rem;">👶</span>
+                    <span class="badge badge-completed">1 Specialist</span>
+                </div>
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 0.5rem;">
+                    Pediatrics
+                </h3>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.25rem; line-height: 1.5;">
+                    Comprehensive childcare, vaccinations and pediatric emergencies.
+                </p>
+                
+                <div style="border-top: 1px solid var(--border-color); padding-top: 0.85rem; margin-bottom: 1rem;">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
+                        Consulting Doctors:
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; font-size: 0.9rem;">
+                        <strong style="color: var(--text-main);">Dr. Sneha Reddy</strong>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); background: var(--bg-main); padding: 0.15rem 0.5rem; border-radius: var(--radius-sm);">
+                            Room 104
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <a href="${pageContext.request.contextPath}/patient/book-token.jsp" class="btn btn-outline" style="width: 100%; text-align: center; margin-top: 0.5rem;">
+                Book Token Online
+            </a>
+        </div>
     </div>
 
     <!-- Hospital Contact, Location & Emergency Assistance -->
