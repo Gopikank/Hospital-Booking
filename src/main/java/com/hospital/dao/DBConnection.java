@@ -109,11 +109,65 @@ public class DBConnection {
         username = newUser;
         password = newPass;
         useFallback = false;
+        checkedPrimaryReachability = false;
+    }
+
+    private static volatile boolean checkedPrimaryReachability = false;
+
+    private static boolean isPrimaryReachable() {
+        if (url == null || url.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            String temp = url.trim();
+            if (temp.startsWith("jdbc:mysql://")) {
+                temp = temp.substring("jdbc:mysql://".length());
+            } else if (temp.startsWith("mysql://")) {
+                temp = temp.substring("mysql://".length());
+            }
+            int slashIdx = temp.indexOf('/');
+            String hostPort = (slashIdx > 0) ? temp.substring(0, slashIdx) : temp;
+            int qIdx = hostPort.indexOf('?');
+            if (qIdx > 0) {
+                hostPort = hostPort.substring(0, qIdx);
+            }
+            String host = hostPort;
+            int port = 3306;
+            if (hostPort.contains(":")) {
+                String[] parts = hostPort.split(":", 2);
+                host = parts[0];
+                try {
+                    port = Integer.parseInt(parts[1]);
+                } catch (NumberFormatException ignored) {
+                }
+            }
+
+            java.net.InetAddress addr = java.net.InetAddress.getByName(host);
+            try (java.net.Socket socket = new java.net.Socket()) {
+                socket.connect(new java.net.InetSocketAddress(addr, port), 2000);
+                return true;
+            } catch (Exception socketEx) {
+                System.err.println("[DBConnection] Primary DB host " + host + ":" + port + " unreachable: " + socketEx.getMessage());
+                return false;
+            }
+        } catch (Exception dnsEx) {
+            System.err.println("[DBConnection] Primary DB DNS resolution failed: " + dnsEx.getMessage());
+            return false;
+        }
     }
 
     public static Connection getConnection() throws SQLException {
         if (useFallback) {
             return getFallbackConnection();
+        }
+
+        if (!checkedPrimaryReachability) {
+            checkedPrimaryReachability = true;
+            if (!isPrimaryReachable()) {
+                System.err.println("[DBConnection Alert] Primary MySQL is unreachable. Activating Embedded Database Engine fallback.");
+                useFallback = true;
+                return getFallbackConnection();
+            }
         }
 
         try {
